@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final int[][] board = new int[3][3];
     private TextView[][] textViews;
     private final GameStateHelper gameStateHelper = new GameStateHelper();
+    private int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +49,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = v.getId();
         TextView textView = findViewById(id);
         if (isUserTurn) {
-            textView.setText("O");
-        } else {
             textView.setText("X");
+        } else {
+            textView.setText("O");
         }
+        count++;
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -78,11 +80,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 gameReStart();
             });
 
+            builder.setNegativeButton("취소", (dialog, which) -> {});
+
             if (result == 1) {
                 builder.setMessage("게임에서 승리하셨습니다!\n재시작하시겠습니까?");
                 builder.show();
             } else if (result == 0){
                 builder.setMessage("게임에서 패배하셨습니다ㅠㅠ\n재시작하시겠습니까?");
+                builder.show();
+            }
+        } else {
+            if (count == 9) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("결과");
+                builder.setMessage("게임에서 비겼습니다!\n재시작하시겠습니까?");
+                builder.setPositiveButton("확인", (dialog, which) -> {
+                    gameReStart();
+                });
+
+                builder.setNegativeButton("취소", (dialog, which) -> {});
+
                 builder.show();
             }
         }
@@ -109,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 board[i][j] = 0;
             }
         }
+        count = 0;
         isUserTurn = true;
     }
 }

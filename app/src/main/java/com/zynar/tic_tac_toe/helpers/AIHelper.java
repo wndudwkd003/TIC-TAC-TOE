@@ -1,4 +1,5 @@
 package com.zynar.tic_tac_toe.helpers;
+import java.util.Random;
 
 public class AIHelper {
     private static final int MIN_NUMBER = -10000;
@@ -7,16 +8,31 @@ public class AIHelper {
     public int[] getNextMove(int[][] board) {
         int maxEval = MIN_NUMBER;
         int[] move = new int[2];
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (board[i][j] == 0) {
-                    board[i][j] = 2;
-                    int eval = minimax(board, 0, false);
-                    board[i][j] = 0;
-                    if (eval > maxEval) {
-                        maxEval = eval;
+        Random random = new Random();
+        random.setSeed(System.currentTimeMillis());
+        int randomNum = random.nextInt(100);
+        if (randomNum >= 60) {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (board[i][j] == 0) {
                         move[0] = i;
                         move[1] = j;
+                    }
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (board[i][j] == 0) {
+                        board[i][j] = 2;
+                        int eval = minimax(board, 0, false);
+                        board[i][j] = 0;
+                        if (eval > maxEval) {
+                            maxEval = eval;
+                            move[0] = i;
+                            move[1] = j;
+                        }
                     }
                 }
             }

@@ -125,7 +125,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
+
+
         aiTurnListener.onAiTurn();
+        count++;
+        result = gameStateHelper.check(board);
+        if (result != -1) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("결과");
+
+            builder.setPositiveButton("확인", (dialog, which) -> {
+                gameReStart();
+            });
+
+            builder.setNegativeButton("취소", (dialog, which) -> {});
+
+            if (result == 1) {
+                builder.setMessage("게임에서 승리하셨습니다!\n재시작하시겠습니까?");
+                builder.show();
+            } else if (result == 0){
+                builder.setMessage("게임에서 패배하셨습니다ㅠㅠ\n재시작하시겠습니까?");
+                builder.show();
+            }
+        } else {
+            if (count == 9) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("결과");
+                builder.setMessage("게임에서 비겼습니다!\n재시작하시겠습니까?");
+                builder.setPositiveButton("확인", (dialog, which) -> {
+                    gameReStart();
+                });
+
+                builder.setNegativeButton("취소", (dialog, which) -> {});
+
+                builder.show();
+            }
+        }
     }
 
     private void setClickListener(ActivityMainBinding binding) {

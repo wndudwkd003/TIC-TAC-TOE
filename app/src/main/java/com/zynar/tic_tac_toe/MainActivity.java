@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setClickListener(binding); // 클릭 리스너 등록
@@ -89,9 +90,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textView.setText("X");
         count++;    // 현재 카운트 증가
         gameStateCheck(gameStateHelper.check(board)); // 현재 게임 상태 체킹
-        aiTurnListener.onAiTurn();  // AI 턴으로 변경되어 AI가 둘 수를 결정
-        count++;    // 현재 카운트 증가
-        gameStateCheck(gameStateHelper.check(board)); // 현재 게임 상태 체킹
+        if (count <= 8) {
+            aiTurnListener.onAiTurn();  // AI 턴으로 변경되어 AI가 둘 수를 결정
+            count++;    // 현재 카운트 증가
+            gameStateCheck(gameStateHelper.check(board)); // 현재 게임 상태 체킹
+        }
     }
 
     private void gameStateCheck(int result) {

@@ -17,46 +17,18 @@ public class AIHelper {
         int randomNum = random.nextInt(100);
         List<List<Integer>> emptyList = new ArrayList<>();
 
-        boolean flag = false;
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (board[i][j] == 0) {
-                    flag = true;
-                    break;
-                }
-            }
-        }
-        if (flag) {
-            if (randomNum >= 60) {
-                for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        if (board[i][j] == 0) {
-                            emptyList.add(Arrays.asList(i, j));
-                        }
-                    }
-                }
-                int index = random.nextInt(emptyList.size()-1);
-                move[0] = emptyList.get(index).get(0);
-                move[1] = emptyList.get(index).get(1);
-                emptyList.clear();
-            }
-            else {
-                for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        if (board[i][j] == 0) {
-                            board[i][j] = 2;
-                            int eval = minimax(board, 0, false);
-                            board[i][j] = 0;
-                            if (eval > maxEval) {
-                                maxEval = eval;
-                                move[0] = i;
-                                move[1] = j;
-                            }
-                        }
+        if (randomNum >= 85) {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (board[i][j] == 0) {
+                        emptyList.add(Arrays.asList(i, j));
                     }
                 }
             }
+            int index = random.nextInt(emptyList.size()-1);
+            move[0] = emptyList.get(index).get(0);
+            move[1] = emptyList.get(index).get(1);
+            emptyList.clear();
         }
         else {
             for (int i = 0; i < 3; i++) {
@@ -74,6 +46,7 @@ public class AIHelper {
                 }
             }
         }
+
         return move;
     }
     public int minimax(int[][] board, int depth, boolean isMax) {

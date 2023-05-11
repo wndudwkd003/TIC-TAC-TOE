@@ -19,13 +19,12 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private boolean isUserTurn = true;
-    private final int[][] board = new int[3][3];
-    private TextView[][] textViews;
-    private final GameStateHelper gameStateHelper = new GameStateHelper();
-    private int count = 0;
-
-    private AIHelper aiHelper = new AIHelper();
+    private boolean isUserTurn = true;  // 현재 누구의 턴인지 플래그
+    private final int[][] board = new int[3][3];    // 실제 틱택토 보드 배열
+    private TextView[][] textViews; // 틱택토가 그려질 배열
+    private final GameStateHelper gameStateHelper = new GameStateHelper();  // 보드의 상태 체크하는 헬퍼
+    private int count = 0;  // 현재 수 카운트
+    private final AIHelper aiHelper = new AIHelper();   // AI 헬퍼
 
     public interface AiTurnListener {
         void onAiTurn();
@@ -38,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         setClickListener(binding); // 클릭 리스너 등록
 
         textViews = new TextView[][]{
@@ -46,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {binding.tv21, binding.tv22, binding.tv23},
                 {binding.tv31, binding.tv32, binding.tv33}
         };
-
 
         binding.fabRetry.setOnClickListener(v->{
             gameReStart();
@@ -62,9 +59,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 isUserTurn = !isUserTurn;
             }
         };
-
-
-
     }
 
     @Override
@@ -72,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = v.getId();
         TextView textView = findViewById(id);
 
+        // 터치한곳의 배열 좌표값을 배열에 입력
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 TextView tv = textViews[i][j];
@@ -89,47 +84,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (isUserTurn) {
             textView.setText("X");
         }
-        count++;
-        isUserTurn = !isUserTurn;
+        count++;    // 현재 카운트 증가
+        isUserTurn = !isUserTurn;   // 현재 차례 변경
 
-        int result = gameStateHelper.check(board);
-        if (result != -1) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("결과");
+        gameStateCheck(gameStateHelper.check(board)); // 현재 게임 상태 체킹
 
-            builder.setPositiveButton("확인", (dialog, which) -> {
-                gameReStart();
-            });
+        aiTurnListener.onAiTurn();  // AI 턴으로 변경되어 AI가 둘 수를 결정
+        count++;    // 현재 카운트 증가
+        gameStateCheck(gameStateHelper.check(board)); // 현재 게임 상태 체킹
+    }
 
-            builder.setNegativeButton("취소", (dialog, which) -> {});
-
-            if (result == 1) {
-                builder.setMessage("게임에서 승리하셨습니다!\n재시작하시겠습니까?");
-                builder.show();
-            } else if (result == 0){
-                builder.setMessage("게임에서 패배하셨습니다ㅠㅠ\n재시작하시겠습니까?");
-                builder.show();
-            }
-        } else {
-            if (count == 9) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("결과");
-                builder.setMessage("게임에서 비겼습니다!\n재시작하시겠습니까?");
-                builder.setPositiveButton("확인", (dialog, which) -> {
-                    gameReStart();
-                });
-
-                builder.setNegativeButton("취소", (dialog, which) -> {});
-
-                builder.show();
-            }
-        }
-
-
-
-        aiTurnListener.onAiTurn();
-        count++;
-        result = gameStateHelper.check(board);
+    private void gameStateCheck(int result) {
         if (result != -1) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("결과");

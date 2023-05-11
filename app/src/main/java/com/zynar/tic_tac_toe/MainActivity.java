@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.zynar.tic_tac_toe.databinding.ActivityMainBinding;
+import com.zynar.tic_tac_toe.helpers.AIHelper;
 import com.zynar.tic_tac_toe.helpers.GameStateHelper;
 
 import java.util.ArrayList;
@@ -23,6 +24,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView[][] textViews;
     private final GameStateHelper gameStateHelper = new GameStateHelper();
     private int count = 0;
+
+    private AIHelper aiHelper = new AIHelper();
+
+    public interface AiTurnListener {
+        void onAiTurn();
+    }
+
+    private AiTurnListener aiTurnListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,18 +51,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.fabRetry.setOnClickListener(v->{
             gameReStart();
         });
+
+        aiTurnListener = new AiTurnListener() {
+            @Override
+            public void onAiTurn() {
+                int[] move = aiHelper.getNextMove(board);
+                TextView tv = textViews[move[0]][move[1]];
+                tv.setText("O");
+                board[move[0]][move[1]] = 2;
+                isUserTurn = !isUserTurn;
+            }
+        };
+
+
+
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
         TextView textView = findViewById(id);
-        if (isUserTurn) {
-            textView.setText("X");
-        } else {
-            textView.setText("O");
-        }
-        count++;
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -69,6 +86,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
+        if (isUserTurn) {
+            textView.setText("X");
+        }
+        count++;
         isUserTurn = !isUserTurn;
 
         int result = gameStateHelper.check(board);
@@ -103,6 +124,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 builder.show();
             }
         }
+
+        aiTurnListener.onAiTurn();
     }
 
     private void setClickListener(ActivityMainBinding binding) {

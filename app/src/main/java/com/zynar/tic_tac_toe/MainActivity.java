@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final GameStateHelper gameStateHelper = new GameStateHelper();  // 보드의 상태 체크하는 헬퍼
     private int count = 0;  // 현재 수 카운트
     private final AIHelper aiHelper = new AIHelper();   // AI 헬퍼
-
+    private boolean isUserTurn = true;  // 유저 턴 판별 플래그
     public interface AiTurnListener {
         void onAiTurn();
     }
@@ -89,11 +89,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         board[i][j] = 1;
         textView.setText("X");
         count++;    // 현재 카운트 증가
+        isUserTurn = false; // 플레이어 수를 뒀기 때문에 턴 변경
         gameStateCheck(gameStateHelper.check(board)); // 현재 게임 상태 체킹
-        if (count <= 8) {
-            aiTurnListener.onAiTurn();  // AI 턴으로 변경되어 AI가 둘 수를 결정
+
+        // AI 턴일경우 아래 조건문 실행
+        if (!isUserTurn) {
+            aiTurnListener.onAiTurn();  // AI가 둘 수를 결정
             count++;    // 현재 카운트 증가
             gameStateCheck(gameStateHelper.check(board)); // 현재 게임 상태 체킹
+            isUserTurn = true;  // 플레이어 턴으로 변경
         }
     }
 
@@ -119,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 builder.setMessage("게임에서 패배하셨습니다ㅠㅠ\n재시작하시겠습니까?");
                 builder.show();
             }
+            isUserTurn = true;  // 게임 결과가 나왔음
         } else {
             // 카운트가 9면 보드가 꽉 찼음 비긴거
             if (count == 9) {
@@ -130,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
                 builder.setNegativeButton("취소", (dialog, which) -> {});
                 builder.show();
+                isUserTurn = true;  // 게임 결과가 나왔음
             }
         }
     }
@@ -157,5 +163,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         count = 0;
+        isUserTurn = true;
     }
 }

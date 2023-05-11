@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.zynar.tic_tac_toe.databinding.ActivityMainBinding;
 import com.zynar.tic_tac_toe.helpers.AIHelper;
@@ -19,7 +20,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private boolean isUserTurn = true;  // 현재 누구의 턴인지 플래그
     private final int[][] board = new int[3][3];    // 실제 틱택토 보드 배열
     private TextView[][] textViews; // 틱택토가 그려질 배열
     private final GameStateHelper gameStateHelper = new GameStateHelper();  // 보드의 상태 체크하는 헬퍼
@@ -39,25 +39,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(binding.getRoot());
         setClickListener(binding); // 클릭 리스너 등록
 
+        // 행렬에 각각의 주소 저장
         textViews = new TextView[][]{
                 {binding.tv11, binding.tv12, binding.tv13},
                 {binding.tv21, binding.tv22, binding.tv23},
                 {binding.tv31, binding.tv32, binding.tv33}
         };
 
+        // 다시하기 버튼
         binding.fabRetry.setOnClickListener(v->{
             gameReStart();
         });
 
-        aiTurnListener = new AiTurnListener() {
-            @Override
-            public void onAiTurn() {
-                int[] move = aiHelper.getNextMove(board);
-                TextView tv = textViews[move[0]][move[1]];
-                tv.setText("O");
-                board[move[0]][move[1]] = 2;
-                isUserTurn = !isUserTurn;
-            }
+        // AI 턴 리스너 AI 턴 실행
+        aiTurnListener = () -> {
+            int[] move = aiHelper.getNextMove(board);   // AI가 생각한 최적의 수를 반환 move[0] = x, move[1] = y
+            TextView tv = textViews[move[0]][move[1]];
+            tv.setText("O");    // AI가 입력한 칸에 O 입력
+            board[move[0]][move[1]] = 2;
         };
     }
 
@@ -71,24 +70,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             for (int j = 0; j < 3; j++) {
                 TextView tv = textViews[i][j];
                 if (textView.equals(tv)) {
-                    if (isUserTurn) {
-                        board[i][j] = 1;
+                    // 이미 선택되어 있는 칸을 클릭했을 때 온클릭 메서드 탈출
+                    if (board[i][j] != 0) {
+                        Toast.makeText(this, "이미 선택되어 있는 칸입니다!", Toast.LENGTH_SHORT).show();
+                        return;
                     } else {
-                        board[i][j] = 2;
+                        // 유저 턴 실행
+                        userTurnPlay(textView, i, j);
+                        break;
                     }
-                    break;
                 }
             }
         }
+    }
 
-        if (isUserTurn) {
-            textView.setText("X");
-        }
+    private void userTurnPlay(TextView textView, int i, int j) {
+        board[i][j] = 1;
+        textView.setText("X");
         count++;    // 현재 카운트 증가
-        isUserTurn = !isUserTurn;   // 현재 차례 변경
-
         gameStateCheck(gameStateHelper.check(board)); // 현재 게임 상태 체킹
-
         aiTurnListener.onAiTurn();  // AI 턴으로 변경되어 AI가 둘 수를 결정
         count++;    // 현재 카운트 증가
         gameStateCheck(gameStateHelper.check(board)); // 현재 게임 상태 체킹
@@ -96,15 +96,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void gameStateCheck(int result) {
         if (result != -1) {
+            // 결과 창 생성
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("결과");
 
+            // 확인 버튼 생성
             builder.setPositiveButton("확인", (dialog, which) -> {
                 gameReStart();
             });
 
+            // 취소 버튼 생성
             builder.setNegativeButton("취소", (dialog, which) -> {});
 
+            // result 1은 인간이 이겼을 경우, 0은 AI가 이겼을 경우
             if (result == 1) {
                 builder.setMessage("게임에서 승리하셨습니다!\n재시작하시겠습니까?");
                 builder.show();
@@ -113,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 builder.show();
             }
         } else {
+            // 카운트가 9면 보드가 꽉 찼음 비긴거
             if (count == 9) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("결과");
@@ -141,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void gameReStart() {
+        // 리스타트
         TextView[] flatTextViews = Arrays.stream(textViews).flatMap(Arrays::stream).toArray(TextView[]::new);
         Arrays.stream(flatTextViews).forEach(textView -> textView.setText(""));
 
@@ -150,6 +156,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         count = 0;
-        isUserTurn = true;
     }
 }

@@ -125,9 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 builder.setPositiveButton("확인", (dialog, which) -> {
                     gameReStart();
                 });
-
                 builder.setNegativeButton("취소", (dialog, which) -> {});
-
                 builder.show();
             }
         }

@@ -29,7 +29,7 @@ public class AIHelper {
             move[0] = emptyList.get(index).get(0);
             move[1] = emptyList.get(index).get(1);
             emptyList.clear();
-        }
+        } 
         else {
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
